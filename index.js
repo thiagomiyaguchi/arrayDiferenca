@@ -1,26 +1,22 @@
 const { differenceArray } = require('./differenceArray');
 
-// Captura os argumentos passados via linha de comando
-const args = process.argv.slice(2); // Ignora os dois primeiros argumentos que são do Node.js
+exports.handler = async (event) => {
+  try {
+    if (!event.array1 || !event.array2) {
+      throw new Error('Os parâmetros array1 e array2 são obrigatórios.');
+    }
 
-if (args.length !== 2) {
-  console.error('Por favor, forneça dois arrays como argumentos.');
-  process.exit(1);
-}
+    // Separa as entradas de acordo com o espaço
+    const array1 = event.array1.split(/\s+/).map((item) => item.trim());
+    const array2 = event.array2.split(/\s+/).map((item) => item.trim());
 
-try {
-  // Converte os argumentos (strings) para arrays utilizando JSON.parse
-  const array1 = JSON.parse(args[0]); // Transforma o primeiro argumento em um array
-  const array2 = JSON.parse(args[1]); // Transforma o segundo argumento em um array
+    const resultado = differenceArray(array1, array2);
 
-  // Verifica se os argumentos são arrays válidos
-  if (!Array.isArray(array1) || !Array.isArray(array2)) {
-    throw new Error('Ambos os argumentos devem ser arrays válidos.');
+    return {
+      resultado: resultado.length > 0 ? resultado.join(' ') : '', // Resultado separado por espaços
+    };
+  } catch (error) {
+    console.error('Erro:', error.message);
+    return { erro: error.message };
   }
-
-  // Chama a função de diferença e exibe o resultado
-  const resultado = differenceArray(array1, array2);
-  console.log('Diferença entre os arrays:', resultado);
-} catch (error) {
-  console.error('Erro:', error.message);
-}
+};
